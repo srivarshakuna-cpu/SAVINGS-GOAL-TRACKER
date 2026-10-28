@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <!-- Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Notifications & Reminders</h1>
+            <p class="page-description">Stay informed on goal deadlines, milestones, and savings streak achievements.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btn-mark-all-read" onclick="markAllNotificationsRead()">
+            <i data-lucide="check-check"></i> <span>Mark All as Read</span>
+          </button>
+        </div>
+
+        <!-- Notification List Container -->
+        <div class="card">
+          <div class="card-body" id="notifications-container" style="padding: 1rem;">
+            <div class="skeleton" style="height: 64px; margin-bottom: 0.75rem;"></div>
+            <div class="skeleton" style="height: 64px;"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.auth.requireAuth()) {
+      renderAppShell('notifications');
+      loadNotifications();
+    }
+
+    async function loadNotifications() {
+      try {
+        const res = await window.api.notifications.list();
+        if (!res.success) throw new Error(res.error);
+
+        const list = res.data || [];
+        const container = document.getElementById('notifications-container');
+
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon"><i data-lucide="bell-off"></i></div>
+              <div class="empty-state-title">No Notifications Yet</div>
+              <div class="empty-state-desc">You're completely up to date! Goal updates and milestone badges will appear here.</div>
+            </div>
+          `;
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = list.map(n => {
+          const icon = n.type === 'completion' ? 'trophy' : n.type === 'milestone' ? 'award' : n.type === 'streak' ? 'flame' : 'bell';
+          const iconColor = n.type === 'completion' ? 'var(--success)' : n.type === 'streak' ? '#ea580c' : 'var(--primary)';
+
+          return `
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 0.5rem; background: ${n.is_read ? 'transparent' : 'var(--bg-subtle)'}; border-left: 3px solid ${n.is_read ? 'transparent' : 'var(--primary)'};">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="width: 38px; height: 38px; border-radius: var(--radius-full); background: var(--bg-hover); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: ${iconColor};">
+                  <i data-lucide="${icon}" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9375rem; color: var(--text-primary); margin-bottom: 0.15rem;">
+                    ${n.title}
+                  </div>
+                  <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.4;">
+                    ${n.message}
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">
+                    ${formatDate(n.created_at)}
+                  </div>
+                </div>
+              </div>
+
+              ${!n.is_read ? `
+                <button class="btn btn-ghost btn-sm" onclick="markNotificationRead('${n.id}')" title="Mark as read">
+                  <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                </button>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        showToast('Failed to load notifications: ' + err.message, 'error');
+      }
+    }
+
+    async function markNotificationRead(id) {
+      try {
+        await window.api.notifications.markRead(id);
+        loadNotifications();
+        syncNotificationBadges();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function markAllNotificationsRead() {
+      try {
+        await window.api.notifications.markAllRead();
+        showToast('All notifications marked as read.', 'success');
+        loadNotifications();
+        syncNotificationBadges();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>
+

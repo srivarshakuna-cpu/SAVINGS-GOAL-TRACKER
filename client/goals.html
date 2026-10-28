@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Savings Goals — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Savings Goals</h1>
+            <p class="page-description">Manage and monitor all your active targets and completed achievements.</p>
+          </div>
+          <a href="/create-goal" class="btn btn-primary">
+            <i data-lucide="plus-circle"></i> <span>Create New Goal</span>
+          </a>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="card mb-6">
+          <div class="card-body" style="padding: 1.25rem;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center;" id="filters-bar">
+              <!-- Search -->
+              <div class="input-group">
+                <span class="input-prefix"><i data-lucide="search" style="width: 16px; height: 16px;"></i></span>
+                <input type="text" id="goal-search" class="form-input input-with-prefix" placeholder="Search goals by name or keyword...">
+              </div>
+
+              <!-- Status Filter -->
+              <select id="goal-status-filter" class="form-select">
+                <option value="all">All Goals Status</option>
+                <option value="active" selected>Active Goals Only</option>
+                <option value="completed">Completed Goals 🏆</option>
+              </select>
+
+              <!-- Category Filter -->
+              <select id="goal-category-filter" class="form-select">
+                <option value="all">All Categories</option>
+              </select>
+
+              <!-- Sort Filter -->
+              <select id="goal-sort-filter" class="form-select">
+                <option value="deadline">Earliest Deadline</option>
+                <option value="progress-desc">Highest Progress %</option>
+                <option value="target-desc">Highest Target Amount</option>
+                <option value="created-desc">Recently Created</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goals Grid Container -->
+        <div class="goals-grid" id="goals-container">
+          <div class="skeleton" style="height: 240px;"></div>
+          <div class="skeleton" style="height: 240px;"></div>
+          <div class="skeleton" style="height: 240px;"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/calculator.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    let allGoals = [];
+    let allCategories = [];
+
+    if (window.auth.requireAuth()) {
+      renderAppShell('goals');
+      initGoalsPage();
+    }
+
+    async function initGoalsPage() {
+      try {
+        const [gRes, cRes] = await Promise.all([
+          window.api.goals.list(),
+          window.api.categories.list()
+        ]);
+
+        allGoals = gRes.data || [];
+        allCategories = cRes.data || [];
+
+        // Populate Category Filter dropdown
+        const catSelect = document.getElementById('goal-category-filter');
+        catSelect.innerHTML = '<option value="all">All Categories</option>' +
+          allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+        renderGoals();
+
+        // Attach event listeners
+        document.getElementById('goal-search').addEventListener('input', renderGoals);
+        document.getElementById('goal-status-filter').addEventListener('change', renderGoals);
+        document.getElementById('goal-category-filter').addEventListener('change', renderGoals);
+        document.getElementById('goal-sort-filter').addEventListener('change', renderGoals);
+      } catch (err) {
+        showToast('Error loading goals: ' + err.message, 'error');
+      }
+    }
+
+    function renderGoals() {
+      const query = document.getElementById('goal-search').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('goal-status-filter').value;
+      const categoryFilter = document.getElementById('goal-category-filter').value;
+      const sortFilter = document.getElementById('goal-sort-filter').value;
+
+      let filtered = allGoals.filter(g => {
+        // Search
+        const matchesQuery = g.name.toLowerCase().includes(query) || (g.description || '').toLowerCase().includes(query);
+
+        // Status
+        let matchesStatus = true;
+        if (statusFilter === 'active') matchesStatus = g.status !== 'completed';
+        if (statusFilter === 'completed') matchesStatus = g.status === 'completed';
+
+        // Category
+        let matchesCategory = true;
+        if (categoryFilter !== 'all') matchesCategory = (g.category_id === categoryFilter);
+
+        return matchesQuery && matchesStatus && matchesCategory;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        if (sortFilter === 'deadline') return new Date(a.deadline) - new Date(b.deadline);
+        if (sortFilter === 'progress-desc') return b.progress_percentage - a.progress_percentage;
+        if (sortFilter === 'target-desc') return b.target_amount - a.target_amount;
+        if (sortFilter === 'created-desc') return new Date(b.created_at) - new Date(a.created_at);
+        return 0;
+      });
+
+      const container = document.getElementById('goals-container');
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1;" class="empty-state">
+            <div class="empty-state-icon"><i data-lucide="target"></i></div>
+            <div class="empty-state-title">No Savings Goals Match Your Filters</div>
+            <div class="empty-state-desc">Try clearing your search terms or create a new savings goal.</div>
+            <a href="/create-goal" class="btn btn-primary btn-sm">Create New Goal</a>
+          </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(g => {
+        const isComplete = g.status === 'completed' || g.progress_percentage >= 100;
+        const cat = allCategories.find(c => c.id === g.category_id);
+
+        return `
+          <div class="card card-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div class="goal-icon-container">
+                    <i data-lucide="${g.icon_url || 'target'}"></i>
+                  </div>
+                  <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.125rem;">${g.name}</h3>
+                    <span class="badge ${isComplete ? 'badge-success' : 'badge-primary'}">${cat ? cat.name : 'Savings'}</span>
+                  </div>
+                </div>
+                ${isComplete ? '<span class="badge badge-success">Completed 🏆</span>' : `<span class="badge badge-warning">${g.days_remaining}d left</span>`}
+              </div>
+
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                ${g.description || 'Personal savings goal target.'}
+              </p>
+
+              <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.35rem;">
+                <span class="text-muted">Saved: <strong style="color: var(--text-primary);">${formatCurrency(g.saved_amount)}</strong></span>
+                <span class="text-muted">Target: <strong>${formatCurrency(g.target_amount)}</strong></span>
+              </div>
+
+              <div class="progress-bar-container" style="height: 10px; margin-bottom: 1rem;">
+                <div class="progress-bar-fill ${isComplete ? 'success' : ''}" style="width: ${g.progress_percentage}%;"></div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--text-muted); background: var(--bg-subtle); padding: 0.625rem 0.875rem; border-radius: var(--radius-md);">
+                <span>Remaining: <strong style="color: var(--text-primary);">${formatCurrency(g.remaining_amount)}</strong></span>
+                <span>Req: <strong style="color: var(--primary);">${formatCurrency(g.recommended_monthly)}/mo</strong></span>
+              </div>
+            </div>
+
+            <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+              <a href="/goal-details?id=${g.id}" class="btn btn-outline btn-sm">
+                <span>View Details</span> <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+              </a>
+              <button class="btn btn-primary btn-sm" onclick="quickDepositToGoal('${g.id}')">
+                <i data-lucide="plus"></i> <span>Add Savings</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function quickDepositToGoal(goalId) {
+      loadGoalsForModal().then(() => {
+        const select = document.getElementById('quick-goal-select');
+        if (select) select.value = goalId;
+        openModal('quick-add-savings-modal');
+      });
+    }
+
+    window.onSavingsAdded = () => {
+      initGoalsPage();
+    };
+  </script>
+</body>
+</html>
+

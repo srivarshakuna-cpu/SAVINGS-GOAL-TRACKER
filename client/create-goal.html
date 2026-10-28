@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Goal — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <div style="max-width: 720px; margin: 0 auto;">
+          <div class="page-header">
+            <div>
+              <a href="/goals" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to Goals
+              </a>
+              <h1 class="page-title">Create New Savings Goal</h1>
+              <p class="page-description">Define a specific milestone and set a target date to turn your plan into reality.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <form id="create-goal-form">
+              <div class="card-body" style="padding: 2rem;">
+                <!-- Goal Name -->
+                <div class="form-group">
+                  <label class="form-label" for="goal-name">Goal Name <span class="required">*</span></label>
+                  <input type="text" class="form-input" id="goal-name" placeholder="e.g. MacBook Pro, Japan Trip, Emergency Cushion" maxlength="100" required>
+                  <div class="form-hint">Make it inspiring, clear, and tangible.</div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                  <label class="form-label" for="goal-desc">Description (Optional)</label>
+                  <textarea class="form-textarea" id="goal-desc" rows="3" placeholder="Why are you saving for this? Add any personal notes or breakdown details."></textarea>
+                </div>
+
+                <!-- Target Amount & Deadline Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                  <div class="form-group">
+                    <label class="form-label" for="goal-target">Target Amount (INR) <span class="required">*</span></label>
+                    <div class="input-group">
+                      <span class="input-prefix">₹</span>
+                      <input type="number" class="form-input input-with-prefix" id="goal-target" placeholder="50,000" min="1" step="any" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="goal-deadline">Target Deadline <span class="required">*</span></label>
+                    <input type="date" class="form-input" id="goal-deadline" required>
+                  </div>
+                </div>
+
+                <!-- Category & Icon Selection -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                  <div class="form-group">
+                    <label class="form-label" for="goal-category">Category <span class="required">*</span></label>
+                    <select class="form-select" id="goal-category" required>
+                      <option value="">Select Category...</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="goal-icon">Goal Icon</label>
+                    <select class="form-select" id="goal-icon">
+                      <option value="target">🎯 Target / General</option>
+                      <option value="laptop">💻 Electronics / Tech</option>
+                      <option value="plane">✈️ Travel / Vacation</option>
+                      <option value="shield-alert">🛡️ Emergency Fund</option>
+                      <option value="car">🚗 Vehicle / Auto</option>
+                      <option value="home">🏠 Home & Real Estate</option>
+                      <option value="graduation-cap">🎓 Education & Degree</option>
+                      <option value="heart-pulse">❤️ Health & Medical</option>
+                      <option value="shopping-bag">🛍️ Shopping & Luxury</option>
+                      <option value="gem">💍 Wedding & Family</option>
+                      <option value="sparkles">✨ Custom / Dream</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Optional Initial Deposit -->
+                <div class="form-group" style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+                  <label class="form-label" for="goal-initial-savings">Initial Deposit (Optional)</label>
+                  <div class="input-group">
+                    <span class="input-prefix">₹</span>
+                    <input type="number" class="form-input input-with-prefix" id="goal-initial-savings" placeholder="e.g. 5,000 to jumpstart this goal" min="0" step="any">
+                  </div>
+                  <div class="form-hint">Deposit money right away into this goal to kick off your streak!</div>
+                </div>
+
+                <!-- Dynamic Real-time Pacing Calculator Preview -->
+                <div id="calculator-preview" style="display: none; background: var(--bg-surface); border: 1px solid var(--primary); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-top: 1rem;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                    <i data-lucide="calculator" style="width: 16px; height: 16px;"></i> Automated Savings Pace
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+                    <span class="text-muted">Required Monthly: <strong id="preview-monthly" style="color: var(--text-primary);">₹0</strong></span>
+                    <span class="text-muted">Required Weekly: <strong id="preview-weekly" style="color: var(--text-primary);">₹0</strong></span>
+                    <span class="text-muted">Days Left: <strong id="preview-days" style="color: var(--text-primary);">0</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer" style="display: flex; justify-content: flex-end; gap: 1rem;">
+                <a href="/goals" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="goal-submit-btn">
+                  <i data-lucide="check"></i> <span>Save & Create Goal</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/calculator.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.auth.requireAuth()) {
+      renderAppShell('goals');
+      initCreateGoal();
+    }
+
+    async function initCreateGoal() {
+      // Set minimum date to today
+      const today = new Date().toISOString().split('T')[0];
+      const deadlineInput = document.getElementById('goal-deadline');
+      deadlineInput.min = today;
+
+      // Default deadline to 3 months from now
+      const defaultDate = new Date();
+      defaultDate.setMonth(defaultDate.getMonth() + 3);
+      deadlineInput.value = defaultDate.toISOString().split('T')[0];
+
+      // Load Categories
+      try {
+        const res = await window.api.categories.list();
+        if (res.success) {
+          const select = document.getElementById('goal-category');
+          select.innerHTML = '<option value="">Select Category...</option>' +
+            res.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+      } catch (e) {
+        console.error('Failed to load categories', e);
+      }
+
+      // Attach dynamic preview listeners
+      document.getElementById('goal-target').addEventListener('input', updatePacingPreview);
+      document.getElementById('goal-initial-savings').addEventListener('input', updatePacingPreview);
+      document.getElementById('goal-deadline').addEventListener('change', updatePacingPreview);
+
+      updatePacingPreview();
+
+      // Form Submit
+      document.getElementById('create-goal-form').addEventListener('submit', handleGoalSubmit);
+    }
+
+    function updatePacingPreview() {
+      const target = Number(document.getElementById('goal-target').value) || 0;
+      const initial = Number(document.getElementById('goal-initial-savings').value) || 0;
+      const deadline = document.getElementById('goal-deadline').value;
+
+      if (target > 0 && deadline) {
+        const breakdown = calculateSavingsBreakdown(target, initial, deadline);
+        document.getElementById('preview-monthly').textContent = formatCurrency(breakdown.monthlyRequired);
+        document.getElementById('preview-weekly').textContent = formatCurrency(breakdown.weeklyRequired);
+        document.getElementById('preview-days').textContent = breakdown.daysRemaining;
+        document.getElementById('calculator-preview').style.display = 'block';
+        if (window.lucide) window.lucide.createIcons();
+      } else {
+        document.getElementById('calculator-preview').style.display = 'none';
+      }
+    }
+
+    async function handleGoalSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('goal-name').value;
+      const description = document.getElementById('goal-desc').value;
+      const target_amount = document.getElementById('goal-target').value;
+      const deadline = document.getElementById('goal-deadline').value;
+      const category_id = document.getElementById('goal-category').value;
+      const icon_url = document.getElementById('goal-icon').value;
+      const initial_savings = document.getElementById('goal-initial-savings').value;
+
+      const btn = document.getElementById('goal-submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating Goal...';
+
+      try {
+        const res = await window.api.goals.create({
+          name,
+          description,
+          target_amount: Number(target_amount),
+          deadline,
+          category_id,
+          icon_url,
+          initial_savings: Number(initial_savings) || 0
+        });
+
+        showToast('Savings goal created successfully! 🎯', 'success');
+        setTimeout(() => window.location.href = `/goal-details?id=${res.data.id}`, 800);
+      } catch (err) {
+        showToast(err.message || 'Failed to create goal.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check"></i> <span>Save & Create Goal</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+  </script>
+</body>
+</html>
+

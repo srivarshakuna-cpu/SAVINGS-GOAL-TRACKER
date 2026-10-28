@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <!-- Header -->
+        <div class="page-header">
+          <div>
+            <div class="badge badge-warning" style="margin-bottom: 0.5rem;">
+              <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Administrator Exclusive
+            </div>
+            <h1 class="page-title">Platform Administration</h1>
+            <p class="page-description">Real-time system health, registered accounts, and global category catalog.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('add-category-modal')">
+            <i data-lucide="plus"></i> <span>Add System Category</span>
+          </button>
+        </div>
+
+        <!-- 6 Platform Analytics Cards -->
+        <div class="summary-cards-grid mb-6">
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">REGISTERED USERS</div>
+              <div class="summary-card-val" id="adm-users-val">0</div>
+              <div style="font-size: 0.75rem; color: var(--success);">All authenticated accounts</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--primary-light); color: var(--primary);">
+              <i data-lucide="users"></i>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">PLATFORM SAVINGS</div>
+              <div class="summary-card-val" id="adm-savings-val" style="color: var(--primary);">₹0</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Across all deposits</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--success-bg); color: var(--success);">
+              <i data-lucide="wallet"></i>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">TOTAL GOALS</div>
+              <div class="summary-card-val" id="adm-goals-val">0</div>
+              <div style="font-size: 0.75rem; color: var(--info);" id="adm-active-goals-sub">0 Active</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--info-bg); color: var(--info);">
+              <i data-lucide="target"></i>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">GOALS COMPLETED</div>
+              <div class="summary-card-val" id="adm-completed-val" style="color: var(--success);">0</div>
+              <div style="font-size: 0.75rem; color: var(--success);">100% Targets hit 🏆</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--success-bg); color: var(--success);">
+              <i data-lucide="trophy"></i>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">SYSTEM CATEGORIES</div>
+              <div class="summary-card-val" id="adm-categories-val">0</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Global taxonomy</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--secondary-light); color: var(--secondary);">
+              <i data-lucide="tags"></i>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">RLS SECURITY</div>
+              <div class="summary-card-val" style="color: var(--success); font-size: 1.25rem;">Active 🛡️</div>
+              <div style="font-size: 0.75rem; color: var(--success);">Supabase RLS Enforced</div>
+            </div>
+            <div class="summary-card-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
+              <i data-lucide="lock"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registered Users Ledger -->
+        <div class="card mb-6">
+          <div class="card-header">
+            <h2 class="card-title">Registered Accounts Directory</h2>
+          </div>
+          <div class="table-container" style="border: none; border-radius: 0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Registered Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-tbody">
+                <tr><td colspan="6" class="text-center" style="padding: 2rem;">Loading accounts...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Global Categories Catalog -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Global Categories Catalog</h2>
+            <button class="btn btn-outline btn-sm" onclick="openModal('add-category-modal')">
+              <i data-lucide="plus"></i> Add Category
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="admin-categories-list" style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+              <div class="skeleton" style="width: 120px; height: 36px;"></div>
+              <div class="skeleton" style="width: 120px; height: 36px;"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="modal-backdrop" id="add-category-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">Create System Category</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('add-category-modal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="add-category-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="new-cat-name">Category Name <span class="required">*</span></label>
+            <input type="text" class="form-input" id="new-cat-name" placeholder="e.g. Cryptocurrency, Child College Fund" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-cat-type">Applicability</label>
+            <select class="form-select" id="new-cat-type">
+              <option value="savings">Savings Only</option>
+              <option value="expense">Expense Only</option>
+              <option value="both" selected>Both Savings & Expenses</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-cat-icon">Icon Identifier</label>
+            <select class="form-select" id="new-cat-icon">
+              <option value="tag">🏷️ Tag</option>
+              <option value="sparkles">✨ Sparkles</option>
+              <option value="coins">🪙 Coins</option>
+              <option value="building">🏢 Real Estate</option>
+              <option value="briefcase">💼 Business</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('add-category-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-cat-btn">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.auth.requireAdminRole()) {
+      renderAppShell('admin');
+      loadAdminStats();
+    }
+
+    async function loadAdminStats() {
+      try {
+        const res = await window.api.admin.stats();
+        if (!res.success) throw new Error(res.error);
+
+        const data = res.data;
+
+        // Populate metrics
+        document.getElementById('adm-users-val').textContent = data.totalUsers;
+        document.getElementById('adm-savings-val').textContent = formatCurrency(data.totalPlatformSavings);
+        document.getElementById('adm-goals-val').textContent = data.totalGoals;
+        document.getElementById('adm-active-goals-sub').textContent = `${data.activeGoals} Active`;
+        document.getElementById('adm-completed-val').textContent = data.completedGoals;
+        document.getElementById('adm-categories-val').textContent = data.categoriesCount;
+
+        // Render users table
+        const uTbody = document.getElementById('admin-users-tbody');
+        uTbody.innerHTML = data.users.map(u => `
+          <tr>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);">${u.id}</td>
+            <td class="font-semibold">${u.full_name || 'Anonymous User'}</td>
+            <td>${u.email}</td>
+            <td><span class="badge ${u.role === 'admin' ? 'badge-warning' : 'badge-primary'}">${u.role}</span></td>
+            <td>${formatDate(u.created_at)}</td>
+            <td><span class="badge badge-success">Active</span></td>
+          </tr>
+        `).join('');
+
+        // Render categories
+        const cContainer = document.getElementById('admin-categories-list');
+        cContainer.innerHTML = (data.categories || []).map(c => `
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600;">
+            <i data-lucide="${c.icon || 'tag'}" style="width: 14px; height: 14px; color: var(--primary);"></i>
+            <span>${c.name}</span>
+            <span class="badge badge-info" style="font-size: 0.625rem;">${c.type}</span>
+          </div>
+        `).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        showToast('Admin access error: ' + err.message, 'error');
+      }
+    }
+
+    document.getElementById('add-category-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('new-cat-name').value;
+      const type = document.getElementById('new-cat-type').value;
+      const icon = document.getElementById('new-cat-icon').value;
+      const btn = document.getElementById('save-cat-btn');
+
+      btn.disabled = true;
+      try {
+        await window.api.admin.createCategory({ name, type, icon });
+        closeModal('add-category-modal');
+        document.getElementById('new-cat-name').value = '';
+        showToast('System category created!', 'success');
+        loadAdminStats();
+      } catch (err) {
+        showToast(err.message || 'Creation failed', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+

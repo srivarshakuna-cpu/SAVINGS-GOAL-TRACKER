@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="app-sidebar"></aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      <!-- Header -->
+      <header class="app-header"></header>
+
+      <!-- Page Body -->
+      <main class="page-container">
+        <!-- Page Title & Actions -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Financial Overview</h1>
+            <p class="page-description">Real-time status of your active goals, monthly contributions, and wealth streaks.</p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="/create-goal" class="btn btn-primary">
+              <i data-lucide="plus"></i> <span>Create New Goal</span>
+            </a>
+            <a href="/transactions" class="btn btn-outline">
+              <i data-lucide="receipt"></i> <span>View History</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 6 Summary Cards Grid -->
+        <div class="summary-cards-grid" id="summary-cards">
+          <!-- Card 1: Total Savings -->
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">TOTAL SAVINGS</div>
+              <div class="summary-card-val" id="val-total-savings">₹0</div>
+              <div style="font-size: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 0.25rem;">
+                <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i> Across all active goals
+              </div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--primary-light); color: var(--primary);">
+              <i data-lucide="wallet"></i>
+            </div>
+          </div>
+
+          <!-- Card 2: Active Goals -->
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">ACTIVE GOALS</div>
+              <div class="summary-card-val" id="val-active-goals">0</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Currently in progress</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--info-bg); color: var(--info);">
+              <i data-lucide="target"></i>
+            </div>
+          </div>
+
+          <!-- Card 3: Completed Goals -->
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">COMPLETED GOALS</div>
+              <div class="summary-card-val" id="val-completed-goals">0</div>
+              <div style="font-size: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 0.25rem;">
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> 100% Targets reached!
+              </div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--success-bg); color: var(--success);">
+              <i data-lucide="trophy"></i>
+            </div>
+          </div>
+
+          <!-- Card 4: Monthly Savings -->
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">THIS MONTH'S SAVINGS</div>
+              <div class="summary-card-val" id="val-monthly-savings">₹0</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Added in current month</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--secondary-light); color: var(--secondary);">
+              <i data-lucide="calendar"></i>
+            </div>
+          </div>
+
+          <!-- Card 5: Remaining Target -->
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">REMAINING TARGET</div>
+              <div class="summary-card-val" id="val-remaining-target">₹0</div>
+              <div style="font-size: 0.75rem; color: var(--warning);">Required to complete all</div>
+            </div>
+            <div class="summary-card-icon" style="background: var(--warning-bg); color: var(--warning);">
+              <i data-lucide="clock"></i>
+            </div>
+          </div>
+
+          <!-- Card 6: Savings Rate -->
+          <div class="summary-card">
+            <div>
+              <div class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">SAVINGS RATE</div>
+              <div class="summary-card-val" id="val-savings-rate">0%</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);" id="val-savings-rate-sub">vs monthly income</div>
+            </div>
+            <div class="summary-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+              <i data-lucide="pie-chart"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Dashboard Split Layout -->
+        <div class="dashboard-main-grid">
+          <!-- Left Column: Active Goals & Recent Transactions -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Active Goals Section -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Priority Savings Goals</h2>
+                  <div class="card-subtitle">Track individual target pacing and completion</div>
+                </div>
+                <a href="/goals" class="btn btn-ghost btn-sm">View All Goals <i data-lucide="chevron-right"></i></a>
+              </div>
+              <div class="card-body">
+                <div id="active-goals-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                  <div class="skeleton" style="height: 140px;"></div>
+                  <div class="skeleton" style="height: 140px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Transactions Table -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Recent Savings Deposits</h2>
+                  <div class="card-subtitle">Latest recorded transactions</div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <a href="/api/savings/export" class="btn btn-outline btn-sm" download>
+                    <i data-lucide="download"></i> Export CSV
+                  </a>
+                  <a href="/transactions" class="btn btn-ghost btn-sm">Full History</a>
+                </div>
+              </div>
+              <div class="table-container" style="border: none; border-radius: 0;">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Goal</th>
+                      <th>Category</th>
+                      <th>Note</th>
+                      <th style="text-align: right;">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-transactions-tbody">
+                    <tr><td colspan="5" class="text-center" style="padding: 2rem;">Loading transactions...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Streaks, Budget Widget & Quick Calculator -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Streak Card -->
+            <div class="streak-card">
+              <div>
+                <div style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9;">Saving Streak</div>
+                <div class="streak-number" id="streak-current-val">0</div>
+                <div style="font-size: 0.8125rem; margin-top: 0.25rem;">Active entries streak 🔥</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.75rem; opacity: 0.85;">🏆 Best Streak</div>
+                <div style="font-size: 1.5rem; font-weight: 800;" id="streak-best-val">0</div>
+                <div style="font-size: 0.75rem; opacity: 0.85;">Keep it going!</div>
+              </div>
+            </div>
+
+            <!-- Monthly Budget Quick Progress -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title" style="font-size: 1rem;">Monthly Budget Summary</h3>
+                <a href="/budget" class="btn btn-ghost btn-sm"><i data-lucide="settings-2"></i></a>
+              </div>
+              <div class="card-body" id="budget-summary-widget">
+                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                  <span class="text-muted">Income: <strong id="bgt-income-val" style="color: var(--text-primary);">₹0</strong></span>
+                  <span class="text-muted">Spent: <strong id="bgt-expenses-val" style="color: var(--error);">₹0</strong></span>
+                </div>
+                <div class="progress-bar-container" style="height: 8px; margin-bottom: 1rem;">
+                  <div class="progress-bar-fill" id="bgt-progress-fill" style="width: 0%;"></div>
+                </div>
+                <div style="background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.8125rem; color: var(--text-muted);">Available for Savings:</span>
+                  <span style="font-size: 1.125rem; font-weight: 800; color: var(--success);" id="bgt-available-val">₹0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Action / Financial Tip Card -->
+            <div class="card" style="background: linear-gradient(135deg, var(--bg-surface), var(--bg-subtle));">
+              <div class="card-body">
+                <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                  <div style="width: 38px; height: 38px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i data-lucide="lightbulb" style="width: 20px; height: 20px;"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.9375rem; margin-bottom: 0.25rem;">Smart Tip: The 50/30/20 Rule</div>
+                    <div style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.4;">
+                      Allocate 50% of your income to needs, 30% to wants, and at least 20% dedicated directly to your savings goals.
+                    </div>
+                    <a href="/insights" style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; font-weight: 600; margin-top: 0.75rem;">
+                      View Personal Insights <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/calculator.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    // Protect page
+    if (window.auth.requireAuth()) {
+      renderAppShell('dashboard');
+      loadDashboardData();
+    }
+
+    async function loadDashboardData() {
+      try {
+        const res = await window.api.dashboard.get();
+        if (!res.success) throw new Error(res.error);
+
+        const { summary, goals, recentTransactions, budget } = res.data;
+
+        // 1. Populate summary cards
+        document.getElementById('val-total-savings').textContent = formatCurrency(summary.totalSavings);
+        document.getElementById('val-active-goals').textContent = summary.activeGoalsCount;
+        document.getElementById('val-completed-goals').textContent = summary.completedGoalsCount;
+        document.getElementById('val-monthly-savings').textContent = formatCurrency(summary.monthlySavings);
+        document.getElementById('val-remaining-target').textContent = formatCurrency(summary.remainingTarget);
+        document.getElementById('val-savings-rate').textContent = `${summary.savingsRate}%`;
+
+        // 2. Streaks
+        document.getElementById('streak-current-val').textContent = `${summary.currentStreak} Days`;
+        document.getElementById('streak-best-val').textContent = `${summary.bestStreak} Days`;
+
+        // 3. Render Active Goals
+        const goalsContainer = document.getElementById('active-goals-list');
+        const activeGoals = goals.filter(g => g.status !== 'completed').slice(0, 4);
+
+        if (activeGoals.length === 0) {
+          goalsContainer.innerHTML = `
+            <div style="grid-column: 1 / -1;" class="empty-state">
+              <div class="empty-state-icon"><i data-lucide="target"></i></div>
+              <div class="empty-state-title">No Active Savings Goals Yet</div>
+              <div class="empty-state-desc">Create your first savings goal and start watching your progress grow.</div>
+              <a href="/create-goal" class="btn btn-primary btn-sm">Create a Goal</a>
+            </div>
+          `;
+        } else {
+          goalsContainer.innerHTML = activeGoals.map(g => `
+            <div class="goal-card card-hover" onclick="window.location.href='/goal-details?id=${g.id}'" style="cursor: pointer;">
+              <div class="goal-card-top">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div class="goal-icon-container">
+                    <i data-lucide="${g.icon_url || 'target'}" style="width: 22px; height: 22px;"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">${g.name}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Due: ${formatDate(g.deadline)}</div>
+                  </div>
+                </div>
+                <span class="badge badge-primary">${g.progress_percentage}%</span>
+              </div>
+              <div class="goal-numbers">
+                <span style="color: var(--text-muted);">Saved: <strong style="color: var(--text-primary);">${formatCurrency(g.saved_amount)}</strong></span>
+                <span style="color: var(--text-muted);">Target: <strong>${formatCurrency(g.target_amount)}</strong></span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill ${g.progress_percentage >= 100 ? 'success' : ''}" style="width: ${g.progress_percentage}%;"></div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // 4. Render Recent Transactions
+        const txTbody = document.getElementById('recent-transactions-tbody');
+        if (recentTransactions.length === 0) {
+          txTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted" style="padding: 2rem;">No savings recorded yet. Add your first deposit!</td></tr>`;
+        } else {
+          txTbody.innerHTML = recentTransactions.map(t => `
+            <tr>
+              <td>${formatDate(t.transaction_date)}</td>
+              <td class="font-semibold">${t.goal_name}</td>
+              <td><span class="badge badge-info">${t.category_name}</span></td>
+              <td class="text-muted" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${t.note || '—'}</td>
+              <td style="text-align: right; font-weight: 700; color: var(--primary);">+${formatCurrency(t.amount)}</td>
+            </tr>
+          `).join('');
+        }
+
+        // 5. Budget Summary Widget
+        if (budget) {
+          document.getElementById('bgt-income-val').textContent = formatCurrency(budget.income);
+          document.getElementById('bgt-expenses-val').textContent = formatCurrency(budget.totalExpenses);
+          document.getElementById('bgt-available-val').textContent = formatCurrency(budget.availableAmount);
+
+          const expensePct = budget.income > 0 ? Math.min(100, (budget.totalExpenses / budget.income) * 100) : 0;
+          const fill = document.getElementById('bgt-progress-fill');
+          fill.style.width = `${expensePct}%`;
+          if (expensePct > 80) fill.style.background = 'var(--error)';
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        showToast('Failed to load dashboard metrics: ' + err.message, 'error');
+      }
+    }
+
+    // Callback when savings deposit is added via quick modal
+    window.onSavingsAdded = () => {
+      loadDashboardData();
+    };
+  </script>
+</body>
+</html>
+

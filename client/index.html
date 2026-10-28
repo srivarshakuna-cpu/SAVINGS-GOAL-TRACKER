@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Savings Goal Tracker — Turn Financial Goals into Achievements</title>
+  <meta name="description" content="Professional fintech platform to set, track, and crush your savings goals with smart insights and streak gamification.">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Landing Navigation -->
+  <header class="landing-nav">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="brand-logo" style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.25rem;">₹</div>
+      <div class="brand-text" style="font-size: 1.25rem; font-weight: 800;">Savings<span>Tracker</span></div>
+    </div>
+    <ul class="nav-links-desktop">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#statistics">Statistics</a></li>
+      <li><a href="/login" class="btn btn-ghost btn-sm">Login</a></li>
+      <li><a href="/register" class="btn btn-primary btn-sm">Get Started</a></li>
+      <li>
+        <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+          <i class="theme-icon" data-lucide="moon"></i>
+        </button>
+      </li>
+    </ul>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div>
+      <div class="hero-tagline">
+        <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Next-Gen Personal Wealth Management
+      </div>
+      <h1 class="hero-title">
+        Turn Your Savings Goals Into <span>Achievements.</span>
+      </h1>
+      <p class="hero-desc">
+        Plan, track, and reach your financial dreams with intelligent milestone calculators, budget insights, visual progress tracking, and streak-powered gamification in ₹ INR.
+      </p>
+      <div class="hero-cta-group">
+        <a href="/register" class="btn btn-primary btn-lg">
+          <span>Start Saving</span> <i data-lucide="arrow-right"></i>
+        </a>
+        <a href="/login" class="btn btn-outline btn-lg">
+          <span>Login to Account</span>
+        </a>
+        <button class="btn btn-secondary btn-lg" onclick="window.auth.loginDemo('admin')">
+          <i data-lucide="zap"></i> <span>Explore Live Demo</span>
+        </button>
+      </div>
+      <div style="margin-top: 2rem; display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; color: var(--text-muted);">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="check" style="color: var(--success); width: 18px; height: 18px;"></i> Bank-grade encryption
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="check" style="color: var(--success); width: 18px; height: 18px;"></i> Powered by Supabase
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Mockup Widget -->
+    <div class="hero-mockup-wrapper">
+      <div class="mockup-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+              <i data-lucide="laptop" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 1.125rem;">MacBook Pro M3 Max</div>
+              <div style="font-size: 0.8125rem; color: var(--text-muted);">Deadline: in 120 days</div>
+            </div>
+          </div>
+          <span class="badge badge-primary">Active</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.9375rem; margin-bottom: 0.5rem;">
+          <span style="color: var(--text-muted);">Saved: <strong>₹80,000</strong></span>
+          <span style="font-weight: 700; color: var(--text-primary);">₹1,99,900</span>
+        </div>
+
+        <div class="progress-bar-container" style="height: 10px; margin-bottom: 1.5rem;">
+          <div class="progress-bar-fill" style="width: 40%;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem;">
+          <div>
+            <div style="color: var(--text-muted); font-size: 0.75rem;">Remaining Target</div>
+            <div style="font-weight: 800; font-size: 1.125rem; color: var(--primary);">₹1,19,900</div>
+          </div>
+          <div>
+            <div style="color: var(--text-muted); font-size: 0.75rem;">Required / Month</div>
+            <div style="font-weight: 800; font-size: 1.125rem; color: var(--secondary);">₹29,975</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Badges -->
+      <div class="floating-badge floating-badge-1">
+        <div style="width: 36px; height: 36px; background: #fef3c7; color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">🔥</div>
+        <div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Saving Streak</div>
+          <div style="font-weight: 800; font-size: 1rem;">14 Days Active!</div>
+        </div>
+      </div>
+
+      <div class="floating-badge floating-badge-2">
+        <div style="width: 36px; height: 36px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="award" style="width: 20px; height: 20px;"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Unlocked Badge</div>
+          <div style="font-weight: 800; font-size: 1rem;">Goal Crusher 🏆</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <div class="section-header">
+      <div class="badge badge-primary" style="margin-bottom: 0.75rem;">Intelligent Toolkit</div>
+      <h2 class="section-title">Everything you need to master your money</h2>
+      <p class="section-subtitle">A high-velocity fintech suite built to keep your savings habits strong and your milestones within reach.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i data-lucide="target"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Smart Savings Goals</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">Create unlimited custom savings goals with deadlines, categories, and target milestones.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i data-lucide="bar-chart-3"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Progress Tracking</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">Real-time progress calculation with automated daily, weekly, and monthly pacing requirements.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i data-lucide="pie-chart"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Budget Planning</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">Map your monthly income, categorize everyday living expenses, and compute real disposable savings.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i data-lucide="brain"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Financial Insights</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">Automated health checks evaluating your savings rate, feasibility warnings, and spending ratios.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i data-lucide="flame"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Saving Streaks</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">Maintain consecutive savings activity with verifiable streaks calculated directly from transaction history.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i data-lucide="trophy"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Achievement System</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">Earn collectible gamification badges as you reach 25%, 50%, 75%, and 100% of your targets.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section" id="how-it-works">
+    <div class="section-header">
+      <div class="badge badge-primary" style="margin-bottom: 0.75rem;">Simple 4-Step Process</div>
+      <h2 class="section-title">How Savings Goal Tracker Works</h2>
+      <p class="section-subtitle">Experience a frictionless path from ambition to financial realization.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem;">Create Your Goal</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Give your dream a name, choose an icon, and assign it to a category.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem;">Set Your Target</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Specify the target amount in ₹ INR and your targeted completion deadline.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem;">Track Your Savings</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Add periodic savings deposits and observe real-time progress calculations.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem;">Reach Your Goal</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Celebrate 100% completion, unlock rare achievements, and savor your success!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Application Statistics Section -->
+  <section class="stats-section" id="statistics">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-number">12,500+</div>
+        <div class="stat-label">Goals Tracked</div>
+      </div>
+      <div>
+        <div class="stat-number">₹8.4 Cr</div>
+        <div class="stat-label">Amount Saved in ₹ INR</div>
+      </div>
+      <div>
+        <div class="stat-number">9,840+</div>
+        <div class="stat-label">Goals Completed</div>
+      </div>
+      <div>
+        <div class="stat-number">18,200+</div>
+        <div class="stat-label">Active Wealth Builders</div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.8125rem; color: #64748b;">
+      * Figures represent simulated community and platform-wide demo metrics.
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="landing-cta">
+    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-primary);">
+      Start Building Your Financial Future Today.
+    </h2>
+    <p style="font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2rem;">
+      Take control of your money, establish lifelong savings habits, and reach your milestone goals.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="/register" class="btn btn-primary btn-lg">Create Free Account</a>
+      <button class="btn btn-secondary btn-lg" onclick="window.auth.loginDemo('admin')">Launch Demo Dashboard</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="footer-content">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="brand-logo" style="width: 32px; height: 32px;">₹</div>
+        <div class="brand-text" style="font-size: 1.125rem;">Savings<span>Tracker</span></div>
+      </div>
+      <div style="display: flex; gap: 2rem; font-size: 0.875rem; color: var(--text-secondary);">
+        <a href="#hero">About</a>
+        <a href="#features">Features</a>
+        <a href="/login">Privacy</a>
+        <a href="/login">Terms</a>
+        <a href="mailto:support@saver.in">Contact</a>
+      </div>
+      <div style="font-size: 0.8125rem; color: var(--text-muted);">
+        © 2026 Savings Goal Tracker. Built with HTML5, CSS3, Vanilla JS, Node.js & Supabase.
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+</html>
+

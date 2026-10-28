@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <div style="max-width: 680px; margin: 0 auto;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Application Settings</h1>
+              <p class="page-description">Customize your display appearance, reminders, and alerts preferences.</p>
+            </div>
+          </div>
+
+          <!-- Appearance Card -->
+          <div class="card mb-6">
+            <div class="card-header">
+              <h2 class="card-title">Theme & Appearance</h2>
+            </div>
+            <div class="card-body">
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                Choose how Savings Goal Tracker appears on your device.
+              </p>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="card card-hover" style="padding: 1.25rem; text-align: center; cursor: pointer; border: 2px solid var(--border-color);" id="theme-card-light" onclick="setAppTheme('light')">
+                  <div style="width: 44px; height: 44px; border-radius: 50%; background: #fef3c7; color: #f59e0b; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                    <i data-lucide="sun"></i>
+                  </div>
+                  <div class="font-bold">Light Theme</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Clean daylight interface</div>
+                </div>
+
+                <div class="card card-hover" style="padding: 1.25rem; text-align: center; cursor: pointer; border: 2px solid var(--border-color);" id="theme-card-dark" onclick="setAppTheme('dark')">
+                  <div style="width: 44px; height: 44px; border-radius: 50%; background: #1e293b; color: #60a5fa; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                    <i data-lucide="moon"></i>
+                  </div>
+                  <div class="font-bold">Dark Theme</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Eye-friendly contrast</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification Preferences Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Notification Preferences</h2>
+            </div>
+            <form id="preferences-form">
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                  <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" id="pref-email" style="width: 18px; height: 18px; margin-top: 2px;" checked>
+                    <div>
+                      <div class="font-semibold" style="font-size: 0.9375rem;">Email Reminders</div>
+                      <div style="font-size: 0.8125rem; color: var(--text-muted);">Receive periodic goal progress summaries and deadline warnings.</div>
+                    </div>
+                  </label>
+
+                  <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" id="pref-reminders" style="width: 18px; height: 18px; margin-top: 2px;" checked>
+                    <div>
+                      <div class="font-semibold" style="font-size: 0.9375rem;">Pacing Reminders</div>
+                      <div style="font-size: 0.8125rem; color: var(--text-muted);">In-app alerts when a goal deadline is less than 30 days away.</div>
+                    </div>
+                  </label>
+
+                  <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" id="pref-streak" style="width: 18px; height: 18px; margin-top: 2px;" checked>
+                    <div>
+                      <div class="font-semibold" style="font-size: 0.9375rem;">Streak & Achievement Alerts</div>
+                      <div style="font-size: 0.8125rem; color: var(--text-muted);">Notifications when you unlock new badges or maintain weekly savings streaks.</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <div class="card-footer" style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" id="save-pref-btn">Save Preferences</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.auth.requireAuth()) {
+      renderAppShell('settings');
+      loadSettings();
+    }
+
+    function setAppTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(CONFIG.THEME_STORAGE_KEY, theme);
+      updateThemeCards(theme);
+      showToast(`Switched to ${theme} theme.`, 'info');
+      window.api.profile.updatePreferences({ theme }).catch(() => {});
+    }
+
+    function updateThemeCards(current) {
+      const lightCard = document.getElementById('theme-card-light');
+      const darkCard = document.getElementById('theme-card-dark');
+      if (current === 'dark') {
+        darkCard.style.borderColor = 'var(--primary)';
+        lightCard.style.borderColor = 'var(--border-color)';
+      } else {
+        lightCard.style.borderColor = 'var(--primary)';
+        darkCard.style.borderColor = 'var(--border-color)';
+      }
+    }
+
+    async function loadSettings() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      updateThemeCards(current);
+
+      try {
+        const res = await window.api.profile.get();
+        if (res.success && res.data.preferences) {
+          const p = res.data.preferences;
+          document.getElementById('pref-email').checked = p.email_notifications !== false;
+          document.getElementById('pref-reminders').checked = p.reminder_notifications !== false;
+          document.getElementById('pref-streak').checked = p.streak_notifications !== false;
+        }
+      } catch (e) {
+        console.warn('Preferences load notice:', e);
+      }
+    }
+
+    document.getElementById('preferences-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email_notifications = document.getElementById('pref-email').checked;
+      const reminder_notifications = document.getElementById('pref-reminders').checked;
+      const streak_notifications = document.getElementById('pref-streak').checked;
+      const theme = document.documentElement.getAttribute('data-theme') || 'light';
+
+      try {
+        await window.api.profile.updatePreferences({
+          theme,
+          email_notifications,
+          reminder_notifications,
+          streak_notifications
+        });
+        showToast('Preferences updated successfully!', 'success');
+      } catch (err) {
+        showToast(err.message || 'Failed to update preferences', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
+

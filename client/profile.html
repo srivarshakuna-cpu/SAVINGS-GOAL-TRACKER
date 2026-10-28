@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <div style="max-width: 680px; margin: 0 auto;">
+          <!-- Header -->
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Personal Profile</h1>
+              <p class="page-description">Manage your account information and preferred financial configurations.</p>
+            </div>
+          </div>
+
+          <!-- Profile Form Card -->
+          <div class="card">
+            <form id="profile-form">
+              <div class="card-body" style="padding: 2rem;">
+                <!-- Avatar Preview -->
+                <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                  <div id="profile-avatar-display" class="avatar" style="width: 72px; height: 72px; font-size: 1.75rem; border-radius: var(--radius-full);">
+                    V
+                  </div>
+                  <div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);" id="profile-name-header">User Name</h3>
+                    <div style="font-size: 0.8125rem; color: var(--text-muted);" id="profile-role-badge">Role: User</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;" id="profile-created-date">Member since: 2026</div>
+                  </div>
+                </div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                  <label class="form-label" for="prof-name">Full Name <span class="required">*</span></label>
+                  <input type="text" class="form-input" id="prof-name" required>
+                </div>
+
+                <!-- Email (Read-only) -->
+                <div class="form-group">
+                  <label class="form-label" for="prof-email">Email Address</label>
+                  <input type="email" class="form-input" id="prof-email" readonly style="background: var(--bg-subtle); cursor: not-allowed;">
+                  <div class="form-hint">Email is managed via Supabase Authentication.</div>
+                </div>
+
+                <!-- Avatar URL -->
+                <div class="form-group">
+                  <label class="form-label" for="prof-avatar">Avatar Image URL</label>
+                  <input type="url" class="form-input" id="prof-avatar" placeholder="https://images.unsplash.com/...">
+                </div>
+
+                <!-- Preferred Currency -->
+                <div class="form-group">
+                  <label class="form-label" for="prof-currency">Preferred Currency</label>
+                  <select class="form-select" id="prof-currency">
+                    <option value="INR" selected>₹ INR — Indian Rupee</option>
+                    <option value="USD">$ USD — US Dollar</option>
+                    <option value="EUR">€ EUR — Euro</option>
+                    <option value="GBP">£ GBP — British Pound</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="card-footer" style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" id="save-profile-btn">
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.auth.requireAuth()) {
+      renderAppShell('profile');
+      loadProfileData();
+    }
+
+    async function loadProfileData() {
+      try {
+        const res = await window.api.profile.get();
+        if (!res.success) throw new Error(res.error);
+
+        const profile = res.data.profile;
+
+        document.getElementById('prof-name').value = profile.full_name || '';
+        document.getElementById('prof-email').value = profile.email || '';
+        document.getElementById('prof-avatar').value = profile.avatar_url || '';
+        document.getElementById('prof-currency').value = profile.currency || 'INR';
+
+        document.getElementById('profile-name-header').textContent = profile.full_name || 'Saver';
+        document.getElementById('profile-role-badge').textContent = `Role: ${profile.role === 'admin' ? 'Administrator 👑' : 'Standard Saver'}`;
+        document.getElementById('profile-created-date').textContent = `Member since: ${formatDate(profile.created_at)}`;
+
+        const avatarEl = document.getElementById('profile-avatar-display');
+        if (profile.avatar_url) {
+          avatarEl.innerHTML = `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        } else {
+          avatarEl.textContent = (profile.full_name || 'U').charAt(0).toUpperCase();
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        showToast('Failed to load profile: ' + err.message, 'error');
+      }
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const full_name = document.getElementById('prof-name').value;
+      const avatar_url = document.getElementById('prof-avatar').value;
+      const currency = document.getElementById('prof-currency').value;
+      const btn = document.getElementById('save-profile-btn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+      try {
+        const res = await window.api.profile.update({ full_name, avatar_url, currency });
+        showToast('Profile updated successfully!', 'success');
+
+        // Update local session
+        const currentSessionUser = window.auth.getAuthUser() || {};
+        window.auth.setSession(window.auth.getAuthToken(), {
+          ...currentSessionUser,
+          full_name,
+          avatar_url,
+          currency
+        });
+
+        loadProfileData();
+      } catch (err) {
+        showToast(err.message || 'Update failed', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Save Changes</span>';
+      }
+    });
+  </script>
+</body>
+</html>
+

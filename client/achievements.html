@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achievements & Streaks — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <!-- Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Achievements & Streaks</h1>
+            <p class="page-description">Celebrate your financial discipline and unlock milestones as your wealth builds.</p>
+          </div>
+        </div>
+
+        <!-- Streaks Showcase Banner -->
+        <div class="card mb-6" style="background: linear-gradient(135deg, #ea580c, #f59e0b); color: #ffffff; border: none;">
+          <div class="card-body" style="padding: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+            <div>
+              <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.9;">🔥 Verified Savings Streak</div>
+              <div style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin: 0.25rem 0;" id="streak-active-val">0 Days</div>
+              <div style="font-size: 0.9375rem; opacity: 0.95;">
+                Keep depositing regularly to maintain your momentum and unlock the Consistent Saver badge!
+              </div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); padding: 1.25rem 1.75rem; border-radius: var(--radius-lg); text-align: center;">
+              <div style="font-size: 0.8125rem; font-weight: 600; opacity: 0.9;">🏆 Personal Best Record</div>
+              <div style="font-size: 2.25rem; font-weight: 800;" id="streak-best-record">0 Days</div>
+              <div style="font-size: 0.75rem; opacity: 0.9;">Calculated from transaction dates</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges Progress Metric -->
+        <div class="card mb-6">
+          <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span class="font-bold" style="font-size: 1.125rem;">Milestone Badges Collection</span>
+              <div class="text-muted" style="font-size: 0.875rem;" id="badge-count-text">Unlocked 0 of 7 Badges</div>
+            </div>
+            <span class="badge badge-primary" id="badge-pct-pill">0% Complete</span>
+          </div>
+        </div>
+
+        <!-- Achievements Grid -->
+        <div class="achievements-grid" id="achievements-container">
+          <div class="skeleton" style="height: 200px;"></div>
+          <div class="skeleton" style="height: 200px;"></div>
+          <div class="skeleton" style="height: 200px;"></div>
+          <div class="skeleton" style="height: 200px;"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.auth.requireAuth()) {
+      renderAppShell('achievements');
+      loadAchievements();
+    }
+
+    async function loadAchievements() {
+      try {
+        const res = await window.api.achievements.get();
+        if (!res.success) throw new Error(res.error);
+
+        const { achievements, streaks } = res.data;
+
+        // Set Streaks
+        document.getElementById('streak-active-val').textContent = `${streaks.currentStreak} Days`;
+        document.getElementById('streak-best-record').textContent = `${streaks.bestStreak} Days`;
+
+        // Badge unlock stats
+        const unlockedCount = achievements.filter(a => a.is_unlocked).length;
+        const totalCount = achievements.length;
+        const pct = Math.round((unlockedCount / totalCount) * 100);
+
+        document.getElementById('badge-count-text').textContent = `Unlocked ${unlockedCount} of ${totalCount} Badges`;
+        document.getElementById('badge-pct-pill').textContent = `${pct}% Collection`;
+
+        // Render Badges
+        const container = document.getElementById('achievements-container');
+        container.innerHTML = achievements.map(a => `
+          <div class="achievement-card ${a.is_unlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-badge-icon">
+              <i data-lucide="${a.icon || 'award'}"></i>
+            </div>
+            <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
+              ${a.name}
+            </h3>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
+              ${a.description}
+            </p>
+            ${a.is_unlocked
+              ? `<span class="badge badge-success"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Unlocked ${formatDate(a.unlocked_at)}</span>`
+              : `<span class="badge badge-primary" style="opacity: 0.7;"><i data-lucide="lock" style="width: 12px; height: 12px;"></i> In Progress</span>`
+            }
+          </div>
+        `).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        showToast('Failed to load achievements: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+
+  <header style="padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);">
+    <a href="/" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+      <div class="brand-logo" style="width: 36px; height: 36px;">₹</div>
+      <div class="brand-text">Savings<span>Tracker</span></div>
+    </a>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+      <i class="theme-icon" data-lucide="moon"></i>
+    </button>
+  </header>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; text-align: center;">
+    <div style="max-width: 480px;">
+      <div style="font-size: 5rem; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 1rem;">404</div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem;">Page Not Found</h1>
+      <p style="font-size: 0.9375rem; color: var(--text-muted); margin-bottom: 2rem; line-height: 1.5;">
+        The requested financial milestone or page could not be located. It might have been moved or deleted.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="/dashboard" class="btn btn-primary">
+          <i data-lucide="layout-dashboard"></i> <span>Return to Dashboard</span>
+        </a>
+        <a href="/" class="btn btn-outline">
+          <i data-lucide="home"></i> <span>Go to Homepage</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+</html>
+

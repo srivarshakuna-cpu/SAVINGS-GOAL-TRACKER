@@ -1,0 +1,51 @@
+# ========================
+# Node.js
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ========================
+# Environment Variables
+# NEVER commit .env — it contains secrets
+# ========================
+.env
+.env.local
+.env.production
+.env.staging
+
+# ========================
+# Logs & Runtime
+# ========================
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# Editor / IDE
+# ========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ========================
+# Build / Dist
+# ========================
+dist/
+build/

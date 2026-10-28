@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goal Details — Savings Goal Tracker</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-header"></header>
+
+      <main class="page-container">
+        <!-- Top Back Link & Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <a href="/goals" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; color: var(--text-muted);">
+            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to All Goals
+          </a>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary btn-sm" id="btn-deposit-here">
+              <i data-lucide="plus"></i> <span>Add Savings</span>
+            </button>
+            <button class="btn btn-outline btn-sm" id="btn-edit-goal">
+              <i data-lucide="edit"></i> <span>Edit Goal</span>
+            </button>
+            <button class="btn btn-danger btn-sm" id="btn-delete-goal">
+              <i data-lucide="trash-2"></i> <span>Delete</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Goal Header Banner Card -->
+        <div class="card mb-6" style="background: linear-gradient(135deg, var(--bg-surface), var(--bg-subtle));">
+          <div class="card-body" style="padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="goal-icon-container" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                  <i data-lucide="target" id="goal-icon-display" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <h1 class="page-title" id="goal-name-display" style="margin-bottom: 0;">Goal Details</h1>
+                    <span class="badge badge-primary" id="goal-status-badge">Active</span>
+                  </div>
+                  <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;" id="goal-cat-display">Category: General</div>
+                </div>
+              </div>
+
+              <!-- Big Percentage Indicator -->
+              <div style="text-align: right;">
+                <div style="font-size: 2.25rem; font-weight: 800; color: var(--primary);" id="goal-pct-display">0%</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">Completed</div>
+              </div>
+            </div>
+
+            <p style="font-size: 0.9375rem; color: var(--text-secondary); margin: 1.25rem 0; max-width: 700px; line-height: 1.5;" id="goal-desc-display">
+              Loading goal details...
+            </p>
+
+            <!-- Major Progress Bar -->
+            <div class="progress-bar-container" style="height: 12px; margin-bottom: 1.25rem;">
+              <div class="progress-bar-fill" id="goal-progress-fill" style="width: 0%;"></div>
+            </div>
+
+            <!-- 4 Milestone Figures -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+              <div>
+                <div class="text-muted" style="font-size: 0.75rem;">TARGET AMOUNT</div>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);" id="fig-target">₹0</div>
+              </div>
+              <div>
+                <div class="text-muted" style="font-size: 0.75rem;">CURRENT SAVINGS</div>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);" id="fig-saved">₹0</div>
+              </div>
+              <div>
+                <div class="text-muted" style="font-size: 0.75rem;">REMAINING NEEDED</div>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--warning);" id="fig-remaining">₹0</div>
+              </div>
+              <div>
+                <div class="text-muted" style="font-size: 0.75rem;">TARGET DEADLINE</div>
+                <div style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary);" id="fig-deadline">—</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);" id="fig-days-left">0 days left</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Grid: Automated Calculator & Pacing Plan VS Transaction History -->
+        <div class="dashboard-main-grid">
+          <!-- Left: Pacing Plan & Smart Calculator Card -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="card">
+              <div class="card-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="calculator" style="color: var(--primary);"></i>
+                  <h3 class="card-title">Savings Pacing Calculator</h3>
+                </div>
+                <span class="badge badge-info">Auto-Calculated</span>
+              </div>
+              <div class="card-body">
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                  Based on your remaining ₹<span id="calc-remaining-sub">0</span> balance and targeted deadline, here is the exact pacing required to cross the finish line on time:
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md);">
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.9375rem;">Required Monthly Savings</div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted);">Recommended per calendar month</div>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);" id="calc-monthly">₹0</div>
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md);">
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.9375rem;">Required Weekly Savings</div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted);">Recommended per 7 days</div>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--secondary);" id="calc-weekly">₹0</div>
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md);">
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.9375rem;">Required Daily Savings</div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted);">Small daily micro-saving target</div>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent);" id="calc-daily">₹0</div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; text-align: center;">
+                  <button class="btn btn-primary w-100" onclick="quickDepositToThisGoal()">
+                    <i data-lucide="plus-circle"></i> <span>Make a Deposit to this Goal</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Transactions History for this goal -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Goal Transaction History</h3>
+              <span class="badge badge-primary" id="goal-tx-count">0 deposits</span>
+            </div>
+            <div class="table-container" style="border: none; border-radius: 0;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Note</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="goal-tx-tbody">
+                  <tr><td colspan="4" class="text-center" style="padding: 2rem;">Loading transactions...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit Goal Modal -->
+  <div class="modal-backdrop" id="edit-goal-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">Edit Savings Goal</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('edit-goal-modal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="edit-goal-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="edit-goal-name">Goal Name <span class="required">*</span></label>
+            <input type="text" class="form-input" id="edit-goal-name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-goal-target">Target Amount (INR) <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="input-prefix">₹</span>
+              <input type="number" class="form-input input-with-prefix" id="edit-goal-target" min="1" step="any" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-goal-deadline">Deadline <span class="required">*</span></label>
+            <input type="date" class="form-input" id="edit-goal-deadline" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-goal-desc">Description</label>
+            <textarea class="form-textarea" id="edit-goal-desc" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('edit-goal-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="edit-goal-submit-btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/calculator.js"></script>
+  <script src="/js/components.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const goalId = urlParams.get('id');
+    let currentGoal = null;
+
+    if (!goalId) {
+      window.location.href = '/goals';
+    } else if (window.auth.requireAuth()) {
+      renderAppShell('goals');
+      loadGoalDetails();
+    }
+
+    async function loadGoalDetails() {
+      try {
+        const res = await window.api.goals.get(goalId);
+        if (!res.success) throw new Error(res.error);
+
+        currentGoal = res.data;
+        const isComplete = currentGoal.status === 'completed' || currentGoal.progress_percentage >= 100;
+
+        // Header displays
+        document.getElementById('goal-name-display').textContent = currentGoal.name;
+        document.getElementById('goal-desc-display').textContent = currentGoal.description || 'Target savings milestone.';
+        document.getElementById('goal-pct-display').textContent = `${currentGoal.progress_percentage}%`;
+        document.getElementById('goal-status-badge').textContent = isComplete ? 'Completed 🏆' : 'Active';
+        document.getElementById('goal-status-badge').className = `badge ${isComplete ? 'badge-success' : 'badge-primary'}`;
+        document.getElementById('goal-cat-display').textContent = `Category: ${currentGoal.category?.name || 'General Savings'}`;
+
+        const iconEl = document.getElementById('goal-icon-display');
+        iconEl.setAttribute('data-lucide', currentGoal.icon_url || 'target');
+
+        // Progress bar
+        const fill = document.getElementById('goal-progress-fill');
+        fill.style.width = `${currentGoal.progress_percentage}%`;
+        if (isComplete) fill.classList.add('success');
+
+        // Milestone figures
+        document.getElementById('fig-target').textContent = formatCurrency(currentGoal.target_amount);
+        document.getElementById('fig-saved').textContent = formatCurrency(currentGoal.saved_amount);
+        document.getElementById('fig-remaining').textContent = formatCurrency(currentGoal.remaining_amount);
+        document.getElementById('fig-deadline').textContent = formatDate(currentGoal.deadline);
+        document.getElementById('fig-days-left').textContent = `${currentGoal.days_remaining} days remaining`;
+
+        // Calculator figures
+        document.getElementById('calc-remaining-sub').textContent = (currentGoal.remaining_amount || 0).toLocaleString('en-IN');
+        document.getElementById('calc-monthly').textContent = formatCurrency(currentGoal.recommended_monthly);
+        document.getElementById('calc-weekly').textContent = formatCurrency(currentGoal.recommended_weekly);
+        document.getElementById('calc-daily').textContent = formatCurrency(currentGoal.recommended_daily);
+
+        // Transactions table
+        const txTbody = document.getElementById('goal-tx-tbody');
+        const txs = currentGoal.transactions || [];
+        document.getElementById('goal-tx-count').textContent = `${txs.length} deposits`;
+
+        if (txs.length === 0) {
+          txTbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted" style="padding: 2rem;">No deposits recorded for this goal yet. Add your first savings!</td></tr>`;
+        } else {
+          txTbody.innerHTML = txs.map(t => `
+            <tr>
+              <td>${formatDate(t.transaction_date)}</td>
+              <td>${t.note || 'Savings contribution'}</td>
+              <td style="text-align: right; font-weight: 700; color: var(--primary);">+${formatCurrency(t.amount)}</td>
+              <td style="text-align: right;">
+                <button class="btn btn-ghost btn-sm" onclick="deleteTransaction('${t.id}')" title="Delete deposit">
+                  <i data-lucide="trash-2" style="width: 14px; height: 14px; color: var(--error);"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        showToast('Failed to load goal: ' + err.message, 'error');
+      }
+    }
+
+    function quickDepositToThisGoal() {
+      loadGoalsForModal().then(() => {
+        const select = document.getElementById('quick-goal-select');
+        if (select) select.value = goalId;
+        openModal('quick-add-savings-modal');
+      });
+    }
+
+    document.getElementById('btn-deposit-here').addEventListener('click', quickDepositToThisGoal);
+
+    // Edit Goal handlers
+    document.getElementById('btn-edit-goal').addEventListener('click', () => {
+      if (!currentGoal) return;
+      document.getElementById('edit-goal-name').value = currentGoal.name;
+      document.getElementById('edit-goal-target').value = currentGoal.target_amount;
+      document.getElementById('edit-goal-deadline').value = currentGoal.deadline;
+      document.getElementById('edit-goal-desc').value = currentGoal.description || '';
+      openModal('edit-goal-modal');
+    });
+
+    document.getElementById('edit-goal-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('edit-goal-submit-btn');
+      btn.disabled = true;
+
+      try {
+        await window.api.goals.update(goalId, {
+          name: document.getElementById('edit-goal-name').value,
+          target_amount: Number(document.getElementById('edit-goal-target').value),
+          deadline: document.getElementById('edit-goal-deadline').value,
+          description: document.getElementById('edit-goal-desc').value,
+          category_id: currentGoal.category_id,
+          icon_url: currentGoal.icon_url,
+          status: currentGoal.status
+        });
+
+        closeModal('edit-goal-modal');
+        showToast('Goal updated successfully!', 'success');
+        loadGoalDetails();
+      } catch (err) {
+        showToast(err.message || 'Failed to update goal', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Delete Goal handler
+    document.getElementById('btn-delete-goal').addEventListener('click', async () => {
+      if (confirm(`Are you sure you want to delete "${currentGoal?.name}"? All associated transactions will be removed.`)) {
+        try {
+          await window.api.goals.delete(goalId);
+          showToast('Goal deleted.', 'info');
+          setTimeout(() => window.location.href = '/goals', 600);
+        } catch (err) {
+          showToast(err.message || 'Delete failed', 'error');
+        }
+      }
+    });
+
+    async function deleteTransaction(txId) {
+      if (confirm('Delete this savings transaction? Goal totals will be recalculated.')) {
+        try {
+          await window.api.savings.delete(txId);
+          showToast('Transaction removed.', 'info');
+          loadGoalDetails();
+        } catch (err) {
+          showToast(err.message || 'Delete failed', 'error');
+        }
+      }
+    }
+
+    window.onSavingsAdded = () => {
+      loadGoalDetails();
+    };
+  </script>
+</body>
+</html>
+
